@@ -33,6 +33,8 @@ class MyModel(nn.Module):
         self.conv5_3 = nn.Conv2d(512, 512, 3, padding = 1)
         self.pool5 = nn.MaxPool2d(kernel_size=2, stride=2)
 
+        self.avgpool = nn.AdaptiveAvgPool2d(output_size=(7, 7))
+
         self.dropout = nn.Dropout2d(0.5)
         
         self.fc1 = nn.Linear(512 * 7 * 7, 4096)
@@ -41,10 +43,6 @@ class MyModel(nn.Module):
         
     def forward(self, x):
         out = x
-        
-        # # handle single images
-        # if (len(out.shape) == 3):
-        #     out = out.unsqueeze(0)
         
         out = F.relu(self.conv1_1(out))
         out = F.relu(self.conv1_2(out))
@@ -68,16 +66,20 @@ class MyModel(nn.Module):
         out = F.relu(self.conv5_2(out))
         out = F.relu(self.conv5_3(out))
         out = self.pool5(out)
+
+        out = self.avgpool(out)
         
         # flatten
-        out = out.view(-1, 512 * 7 * 7)
+        out = out.view(512 * 7 * 7, -1)
                
         out = F.relu(self.fc1(out))
         out = self.dropout(out)
         out = F.relu(self.fc2(out))
         out = self.dropout(out)
         out = self.fc3(out)
-        out = F.log_softmax(out, dim=1)
         
         return out
 
+# from torchvision import models
+# model = models.vgg16(pretrained=True)
+# print(model)
