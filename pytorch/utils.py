@@ -4,8 +4,8 @@ import os.path as osp
 import argparse
 
 Config ={}
-Config['root_path'] = '/Users/chris/Desktop/EE599DEEP LEARNING/HW4/polyvore_outfits'
-# Config['root_path'] = '/mnt/jiali/data/outfits/new_polyvore/test/polyvore_outfits'
+# Config['root_path'] = '/Users/chris/Desktop/EE599DEEP LEARNING/HW4/polyvore_outfits'
+Config['root_path'] = '/mnt/polyvore_outfits'
 Config['meta_file'] = 'polyvore_item_metadata.json'
 Config['checkpoint_path'] = ''
 
