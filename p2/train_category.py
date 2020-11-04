@@ -10,7 +10,7 @@ from tqdm import tqdm
 import os.path as osp
 
 from utils import Config
-from model import model_resnet50, MyModel
+from model import model_mobilenet, MyModel
 from data import get_dataloader
 
 import sys
@@ -80,16 +80,18 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
             if phase == 'train':
                 acc_train_list.append(epoch_acc)
+                loss_train_list.append(epoch_loss)
             if phase == 'test':
                 acc_test_list.append(epoch_acc)
+                loss_test_list.append(epoch_loss)
 
             if phase=='test' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
         if pretrained == True:
-            torch.save(best_model_wts, osp.join(Config['root_path'], Config['checkpoint_path'], 'resnet50.pth'))
-            print('Model saved at: {}'.format(osp.join(Config['root_path'], Config['checkpoint_path'], 'resnet50.pth')))
+            torch.save(best_model_wts, osp.join(Config['root_path'], Config['checkpoint_path'], 'mobilenet.pth'))
+            print('Model saved at: {}'.format(osp.join(Config['root_path'], Config['checkpoint_path'], 'mobilenet.pth')))
         else:
             torch.save(best_model_wts, osp.join(Config['root_path'], Config['checkpoint_path'], 'vgg16.pth'))
             print('Model saved at: {}'.format(osp.join(Config['root_path'], Config['checkpoint_path'], 'vgg16.pth')))
@@ -104,16 +106,17 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 if __name__=='__main__':
     acc_train_list = []
     acc_test_list = []
+    loss_train_list = []
+    loss_test_list = []
 
     dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
 
     if Config['pretrained'] == True:
-        model = model_resnet50
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, classes)
+        model = model_mobilenet
+        fc_features = model.classifier[1].in_features
+        model.classifier[1] = nn.Linear(fc_features, classes)
     else:
         model = MyModel()
-        # model = model.eval()
     
 
     criterion = nn.CrossEntropyLoss()
@@ -121,4 +124,5 @@ if __name__=='__main__':
     device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
 
     train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'], dataset_size=dataset_size, pretrained=Config['pretrained'])
-    plot(acc_train_list, acc_test_list, "pretrained.jpg" if Config['pretrained'] == True else "vgg16.jpg", num_epochs=Config['num_epochs'])
+    plot(acc_train_list, acc_test_list, "finetune_acc.jpg" if Config['pretrained'] == True else "mymodel_acc.jpg", num_epochs=Config['num_epochs'])
+    plot(loss_train_list, loss_test_list, "finetune_loss.jpg" if Config['pretrained'] == True else "mymodel_loss.jpg", num_epochs=Config['num_epochs'])

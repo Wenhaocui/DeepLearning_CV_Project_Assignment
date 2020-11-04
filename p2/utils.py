@@ -7,7 +7,8 @@ Config ={}
 Config['root_path'] = '/Users/chris/Desktop/EE599DEEP LEARNING/HW4/polyvore_outfits'
 # Config['root_path'] = '/mnt/polyvore_outfits'
 Config['meta_file'] = 'polyvore_item_metadata.json'
-Config['test'] = 'test_category_hw.txt'
+Config['test_txt'] = 'test_category_hw.txt'
+Config['out_file'] = 'test_category_output.txt'
 Config['checkpoint_path'] = ''
 
 
