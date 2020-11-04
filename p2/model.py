@@ -4,7 +4,6 @@ import torch.nn.functional as F
 from torchvision.models import mobilenet_v2, resnet50
 
 model_mobilenet = mobilenet_v2(pretrained=True)
-print(resnet50(pretrained=True))
 
 cfgs =  [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
 

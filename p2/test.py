@@ -35,9 +35,10 @@ def create_testset():
 
     image_dir = osp.join(Config['root_path'], 'images')
     files = os.listdir(image_dir)
+    files_set = set(map(lambda x: x[:-4], files))
     X = []; y = []
     for x in test_list:
-        if x + ".jpg" in files and x in id_to_category:
+        if x in files_set and x in id_to_category:
             X.append(x+".jpg")
             y.append(int(id_to_category[x]))
     y = LabelEncoder().fit_transform(y)
@@ -51,17 +52,17 @@ if Config['pretrained'] == True:
     fc_features = model.classifier[1].in_features
     model.classifier[1] = nn.Linear(fc_features, 153)
 
-    model.load_state_dict(torch.load('../mobilenet.pth'))
+    model.load_state_dict(torch.load('/mnt/polyvore_outfits/mobilenet.pth'))
     model.to(device)
 else:
     model = MyModel
-    model.load_state_dict(torch.load('../vgg16.pth'))
+    model.load_state_dict(torch.load('/mnt/polyvore_outfits/vgg16.pth'))
 model.eval()
 
 X_test, y_test = create_testset()
 test_dataset = polyvore_test(X_test, y_test, polyvore_dataset().get_data_transforms()['test'])
 dataloader = DataLoader(test_dataset, shuffle=False,batch_size=len(X_test))
-test_output = open(osp.join(Config['root_path'], Config['test_category_output']), 'w')
+test_output = open(osp.join(Config['root_path'], Config['out_file']), 'w')
 for i, inputs, labels in tqdm(enumerate(dataloader)):
     inputs = inputs.to(device)
     labels = labels.to(device)
