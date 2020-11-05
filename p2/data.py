@@ -117,6 +117,18 @@ class polyvore_dataset:
             
         return X_Train_comp,X_Valid_comp,Y_Train_comp,Y_Valid_comp
 
+    def create_comp_test(self):
+        X = []
+        test_comapatability = open(osp.join(self.root_dir, Config['test_compatability']), 'r')
+        for pair in test_comapatability:
+            pair=pair.strip('\n')
+            pair_list=pair.split()
+            X.append((pair_list[0]+'.jpg',pair_list[1]+'.jpg'))
+            
+        return X
+
+
+
 
 
 # For category classification
@@ -218,6 +230,23 @@ class polyvore_comp(Dataset):
         file_path_1 = osp.join(self.image_dir, self.X_comp[item][0])
         file_path_2 = osp.join(self.image_dir, self.X_comp[item][1])
         return torch.cat((self.transform(Image.open(file_path_1)), self.transform(Image.open(file_path_2))), 0), self.y_comp[item]
+
+
+class polyvore_comp_test(Dataset):
+    def __init__(self, X_comp, transform):
+        self.X_comp = X_comp
+        self.transform = transform
+        self.image_dir = osp.join(Config['root_path'], 'images')
+
+
+    def __len__(self):
+        return len(self.X_comp)
+
+
+    def __getitem__(self, item):
+        file_path_1 = osp.join(self.image_dir, self.X_comp[item][0])
+        file_path_2 = osp.join(self.image_dir, self.X_comp[item][1])
+        return self.X_comp[item], torch.cat((self.transform(Image.open(file_path_1)), self.transform(Image.open(file_path_2))), 0)
 
 
 def get_comploader(debug, batch_size, num_workers):

@@ -28,3 +28,4 @@ Config['pretrained'] = True
 
 Config['train_compatability']='pairwise_comp_train.txt'
 Config['valid_compatability']='pairwise_comp_valid.txt'
+Config['out_compatability'] = 'pairwise_comp_test_res.txt'
