@@ -86,9 +86,10 @@ class polyvore_dataset:
             test_list.append(line)
 
         files = os.listdir(self.image_dir)
+        files_set = set(map(lambda x: x[:-4], files))
         X = []; y = []
         for x in test_list:
-            if x + ".jpg" in files and x in id_to_category:
+            if x in files_set and x in id_to_category:
                 X.append(x+".jpg")
                 y.append(int(id_to_category[x]))
         y = LabelEncoder().fit_transform(y)

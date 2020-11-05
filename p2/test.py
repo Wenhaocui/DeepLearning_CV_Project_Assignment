@@ -21,8 +21,8 @@ with open(osp.join(Config['root_path'], Config['out_file']), 'w') as test_output
     model.classifier[1] = nn.Linear(fc_features, 153)
 
     model.load_state_dict(torch.load(osp.join(Config['root_path'], 'mobilenet.pth')))
-    # model = MyModel()
-    # model.load_state_dict(torch.load(osp.join(Config['root_path'], 'vgg16.pth')))
+    #model = MyModel()
+    #model.load_state_dict(torch.load(osp.join(Config['root_path'], 'vgg16.pth')))
 
     model = model.to(device)
     model.eval()
