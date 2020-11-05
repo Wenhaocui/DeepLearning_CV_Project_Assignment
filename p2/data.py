@@ -242,4 +242,4 @@ def get_comploader(debug, batch_size, num_workers):
                                  batch_size=batch_size,
                                  num_workers=num_workers)
                                  for x in ['train', 'test']}
-    return dataloaders, 2, dataset_size
+    return dataloaders, 1, dataset_size

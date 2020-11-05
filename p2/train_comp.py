@@ -10,7 +10,7 @@ from tqdm import tqdm
 import os.path as osp
 
 from utils import Config
-from model import compModel
+from model import model_mobilenet
 from data import get_comploader
 
 import sys
@@ -52,14 +52,16 @@ def train_comp_model(dataloader, model, criterion, optimizer, device, num_epochs
             running_corrects = 0
 
             for inputs, labels in tqdm(dataloaders[phase]):
+                labels = np.array(labels)
+                labels = torch.Tensor(labels.astype('long'))
                 inputs = inputs.to(device)
                 labels = labels.to(device)
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase=='train'):
                     outputs = model(inputs)
-                    _, pred = torch.max(outputs, 1)
-                    loss = criterion(outputs, labels)
+                    pred = outputs
+                    loss = criterion(torch.flatten(outputs), labels)
 
                     if phase=='train':
                         loss.backward()
@@ -67,7 +69,7 @@ def train_comp_model(dataloader, model, criterion, optimizer, device, num_epochs
 
 
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(pred==labels.data)
+                running_corrects += torch.sum((pred>0.5)==labels.data)
 
             epoch_loss = running_loss / dataset_size[phase]
             epoch_acc = running_corrects.double() / dataset_size[phase]
@@ -101,9 +103,17 @@ if __name__=='__main__':
     loss_test_list = []
 
     dataloaders, classes, dataset_size = get_comploader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
-    model = compModel(input_shape=(224,224,3))
+    # for inputs, labels in tqdm(dataloaders['train']):
+    #     print(inputs.shape)
+    #     print(labels.shape)
+    model = model_mobilenet
+    model.features[0][0] = nn.Conv2d(6, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+    fc_features = model.classifier[1].in_features
+    model.classifier[1] = nn.Sequential(
+        nn.Linear(fc_features, classes),
+        nn.Sigmoid())
 
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=Config['learning_rate'], weight_decay=0.0002)
     device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
 
