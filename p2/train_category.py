@@ -51,8 +51,8 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
             running_corrects = 0
 
             for inputs, labels in tqdm(dataloaders[phase]):
-                # inputs = inputs.to(device)
-                # labels = labels.to(device)
+                inputs = inputs.to(device)
+                labels = labels.to(device)
                 optimizer.zero_grad()
 
                 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = 5, gamma=0.5)
