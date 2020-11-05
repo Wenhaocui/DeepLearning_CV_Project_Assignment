@@ -22,3 +22,8 @@ Config['learning_rate'] = 0.001
 Config['num_workers'] = 5
 
 Config['pretrained'] = False
+
+
+
+Config['train_compatability']='pairwise_comp_train.txt'
+Config['valid_compatability']='pairwise_comp_valid.txt'

@@ -98,6 +98,28 @@ class polyvore_dataset:
         return X, y
 
 
+    def create_comp(self):
+        X_Train_comp = []
+        Y_Train_comp = []
+        X_Valid_comp = []
+        Y_Valid_comp = []
+        train_comapatability = open(osp.join(self.root_dir, Config['train_compatability']), 'r')
+        valid_comapatability = open(osp.join(self.root_dir, Config['valid_compatability']), 'r')
+        for pair in train_comapatability:
+            pair=pair.strip('\n')
+            pair_list=pair.split()
+            X_Train_comp.append((pair_list[1]+'.jpg',pair_list[2]+'.jpg'))
+            Y_Train_comp.append(int(pair_list[0]))
+
+        for pair in valid_comapatability:
+            pair=pair.strip('\n')
+            pair_list=pair.split()
+            X_Valid_comp.append((pair_list[1]+'.jpg',pair_list[2]+'.jpg'))
+            Y_Valid_comp.append(int(pair_list[0]))
+            
+        return X_Train_comp,X_Valid_comp,Y_Train_comp,Y_Valid_comp
+
+
 
 # For category classification
 class polyvore_train(Dataset):
@@ -182,3 +204,42 @@ def get_dataloader(debug, batch_size, num_workers):
 # For Pairwise Compatibility Classification
 
 
+class polyvore_comp(Dataset):
+    def __init__(self, X_comp, y_comp, transform):
+        self.X_comp = X_comp
+        self.y_comp = y_comp
+        self.transform = transform
+        self.image_dir = osp.join(Config['root_path'], 'images')
+
+
+    def __len__(self):
+        return len(self.X_comp)
+
+
+    def __getitem__(self, item):
+        file_path_1 = osp.join(self.image_dir, self.X_comp[item][0])
+        file_path_2 = osp.join(self.image_dir, self.X_comp[item][1])
+        return [self.transform(Image.open(file_path_1)), self.transform(Image.open(file_path_2))], self.y_test[item]
+
+
+def get_comploader(debug, batch_size, num_workers):
+    dataset = polyvore_dataset()
+    transforms = dataset.get_data_transforms()
+    X_Train_comp,X_Valid_comp,Y_Train_comp,Y_Valid_comp = dataset.create_comp()
+
+    if debug==True:
+        train_set = polyvore_comp(X_Train_comp[:100], Y_Train_comp[:100], transform=transforms['train'])
+        test_set = polyvore_comp(X_Valid_comp[:100], Y_Valid_comp[:100], transform=transforms['test'])
+        dataset_size = {'train': len(Y_Train_comp), 'test': len(Y_Valid_comp)}
+    else:
+        train_set = polyvore_comp(X_Train_comp, Y_Train_comp, transforms['train'])
+        test_set = polyvore_comp(X_Valid_comp, Y_Valid_comp, transforms['test'])
+        dataset_size = {'train': len(Y_Train_comp), 'test': len(Y_Valid_comp)}
+
+    datasets = {'train': train_set, 'test': test_set}
+    dataloaders = {x: DataLoader(datasets[x],
+                                 shuffle=True if x=='train' else False,
+                                 batch_size=batch_size,
+                                 num_workers=num_workers)
+                                 for x in ['train', 'test']}
+    return dataloaders, 2, dataset_size

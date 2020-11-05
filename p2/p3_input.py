@@ -27,5 +27,5 @@ def create_comp(json_file, input_file, comp_file):
             line = file_read.readline()
 
 if __name__=='__main__':
-    create_comp('train.json', 'pairwise_compatibility_train.txt', 'compatibility_train.txt')
-    create_comp('valid.json', 'pairwise_compatibility_valid.txt', 'compatibility_valid.txt')
+    create_comp('train.json', 'pairwise_comp_train.txt', 'compatibility_train.txt')
+    create_comp('valid.json', 'pairwise_comp_valid.txt', 'compatibility_valid.txt')
