@@ -36,7 +36,7 @@ class MyModel(nn.Module):
 
     def forward(self, input):
         feature = self.features(input)
-        # linear_input = torch.flatten(feature, 1)
-        linear_input = feature.view(feature.size(0), -1)
+        linear_input = torch.flatten(feature, 1)
+        #linear_input = feature.view(feature.size(0), -1)
         out_put = self.classifier(linear_input)
         return out_put

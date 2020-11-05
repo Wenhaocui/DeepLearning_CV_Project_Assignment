@@ -113,7 +113,7 @@ if __name__=='__main__':
         model.fc = nn.Linear(num_ftrs, classes)
     else:
         model = MyModel()
-        model = model.eval()
+        #model = model.eval()
     
 
     criterion = nn.CrossEntropyLoss()
