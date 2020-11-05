@@ -110,21 +110,21 @@ if __name__=='__main__':
     loss_test_list = []
 
     dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
-    for inputs, labels in tqdm(dataloaders['train']):
-        print(inputs.shape)
-        print(labels.shape)
-    # if Config['pretrained'] == True:
-    #     model = model_mobilenet
-    #     fc_features = model.classifier[1].in_features
-    #     model.classifier[1] = nn.Linear(fc_features, classes)
-    # else:
-    #     model = MyModel()
+    # for inputs, labels in tqdm(dataloaders['train']):
+    #     print(inputs.shape)
+    #     print(labels.shape)
+    if Config['pretrained'] == True:
+        model = model_mobilenet
+        fc_features = model.classifier[1].in_features
+        model.classifier[1] = nn.Linear(fc_features, classes)
+    else:
+        model = MyModel()
     
 
-    # criterion = nn.CrossEntropyLoss()
-    # optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
-    # device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
+    device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
 
-    # train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'], dataset_size=dataset_size, pretrained=Config['pretrained'])
-    # plot(acc_train_list, acc_test_list, "finetune_acc.jpg" if Config['pretrained'] == True else "mymodel_acc.jpg", num_epochs=Config['num_epochs'])
-    # plot(loss_train_list, loss_test_list, "finetune_loss.jpg" if Config['pretrained'] == True else "mymodel_loss.jpg", num_epochs=Config['num_epochs'])
+    train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'], dataset_size=dataset_size, pretrained=Config['pretrained'])
+    plot(acc_train_list, acc_test_list, "finetune_acc.jpg" if Config['pretrained'] == True else "mymodel_acc.jpg", num_epochs=Config['num_epochs'])
+    plot(loss_train_list, loss_test_list, "finetune_loss.jpg" if Config['pretrained'] == True else "mymodel_loss.jpg", num_epochs=Config['num_epochs'])
