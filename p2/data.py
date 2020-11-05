@@ -79,18 +79,16 @@ class polyvore_dataset:
         for k, v in meta_json.items():
             id_to_category[k] = v['category_id'] 
 
-        # add test file 
         test_file = open(osp.join(self.root_dir, Config['test_txt']), 'r')
         test_list = []
         for line in test_file.readlines():
             line = line.strip()
             test_list.append(line)
-        # create X, y pairs
-        files_list = os.listdir(self.image_dir)
-        files_set = set(map(lambda x: x[:-4], files_list))
+
+        files = os.listdir(self.image_dir)
         X = []; y = []
         for x in test_list:
-            if x in files_set and x in id_to_category:
+            if x + ".jpg" in files and x in id_to_category:
                 X.append(x+".jpg")
                 y.append(int(id_to_category[x]))
         y = LabelEncoder().fit_transform(y)
@@ -135,7 +133,7 @@ class polyvore_test(Dataset):
         return self.transform(Image.open(file_path)), self.y_test[item]
 
 
-class polyvore_test_write(Dataset):
+class polyvore_test_final(Dataset):
     def __init__(self, X_test, y_test, transform):
         self.X_test = X_test
         self.y_test = y_test
