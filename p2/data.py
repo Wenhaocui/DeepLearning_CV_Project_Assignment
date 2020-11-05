@@ -70,6 +70,34 @@ class polyvore_dataset:
 
         return X_train, X_test, y_train, y_test, max(y) + 1
 
+    
+    def create_testset(self):
+
+        meta_file = open(osp.join(self.root_dir, Config['meta_file']), 'r')
+        meta_json = json.load(meta_file)
+        id_to_category = {}
+        for k, v in meta_json.items():
+            id_to_category[k] = v['category_id'] 
+
+        # add test file 
+        test_file = open(osp.join(self.root_dir, Config['test_txt']), 'r')
+        test_list = []
+        for line in test_file.readlines():
+            line = line.strip()
+            test_list.append(line)
+        # create X, y pairs
+        files_list = os.listdir(self.image_dir)
+        files_set = set(map(lambda x: x[:-4], files_list))
+        X = []; y = []
+        for x in test_list:
+            if x in files_set and x in id_to_category:
+                X.append(x+".jpg")
+                y.append(int(id_to_category[x]))
+        y = LabelEncoder().fit_transform(y)
+        print('len of test set X: {}, # of categories: {}'.format(len(X), max(y) + 1))
+
+        return X, y
+
 
 
 # For category classification
@@ -105,6 +133,23 @@ class polyvore_test(Dataset):
     def __getitem__(self, item):
         file_path = osp.join(self.image_dir, self.X_test[item])
         return self.transform(Image.open(file_path)), self.y_test[item]
+
+
+class polyvore_test_write(Dataset):
+    def __init__(self, X_test, y_test, transform):
+        self.X_test = X_test
+        self.y_test = y_test
+        self.transform = transform
+        self.image_dir = osp.join(Config['root_path'], 'images')
+
+
+    def __len__(self):
+        return len(self.X_test)
+
+
+    def __getitem__(self, item):
+        file_path = osp.join(self.image_dir, self.X_test[item])
+        return self.X_test[item], self.transform(Image.open(file_path)), self.y_test[item]
 
 
 
