@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.models import mobilenet_v2, resnet50
+from torchvision.models import mobilenet_v2, resnet50, vgg11
 
 model_mobilenet = mobilenet_v2(pretrained=True)
 
@@ -40,3 +40,39 @@ class MyModel(nn.Module):
         linear_input = feature.view(feature.size(0), -1)
         out_put = self.classifier(linear_input)
         return out_put
+
+
+#pairwise model 
+def get_img_output_length(width, height):
+    def get_output_length(input_length):
+        # input_length += 6
+        filter_sizes = [2, 2, 2, 2, 2]
+        padding = [0, 0, 0, 0, 0]
+        stride = 2
+        for i in range(5):
+            input_length = (input_length+2*padding[i]-filter_sizes[i]) // stride + 1
+        return input_length
+    return get_output_length(width)*get_output_length(height) 
+    
+class compModel(nn.Module):
+    def __init__(self, input_shape, pretrained=False):
+        super(compModel, self).__init__()
+        self.vgg = vgg11(pretrained=True)
+        del self.vgg.avgpool
+        del self.vgg.classifier
+        
+        flat_shape = 512 * get_img_output_length(input_shape[1],input_shape[0])
+        self.fully_connect1 = torch.nn.Linear(flat_shape,512)
+        self.fully_connect2 = torch.nn.Linear(512,1)
+
+    def forward(self, x):
+        x1, x2 = x
+        x1 = self.vgg.features(x1)
+        x2 = self.vgg.features(x2)
+        b, _, _, _ = x1.size()        
+        x1 = x1.view([b,-1])
+        x2 = x2.view([b,-1])
+        x = torch.abs(x1-x2)
+        x = self.fully_connect1(x)
+        x = self.fully_connect2(x)
+        return x
