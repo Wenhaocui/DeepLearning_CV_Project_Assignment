@@ -12,13 +12,13 @@ from tqdm import tqdm
 
 from utils import Config
 
-resnet = True
+resnet = False
 
 dataset = polyvore_dataset()
 transforms = dataset.get_data_transforms()
 device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
 
-with open(osp.join(Config['root_path'], Config['test_category_output']), 'w') as test_output:
+with open(osp.join(Config['root_path'], Config['out_file']), 'w') as test_output:
 
     if resnet == True:
         model = model_mobilenet
@@ -30,6 +30,7 @@ with open(osp.join(Config['root_path'], Config['test_category_output']), 'w') as
     else:
         model = MyModel()
         model.load_state_dict(torch.load(osp.join(Config['root_path'], 'vgg16.pth')))
+        model = model.to(device)
     model.eval()
 
 

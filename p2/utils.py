@@ -20,4 +20,4 @@ Config['batch_size'] = 64
 Config['learning_rate'] = 0.001
 Config['num_workers'] = 5
 
-Config['pretrained'] =True
+Config['pretrained'] = False
