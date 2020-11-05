@@ -14,7 +14,7 @@ from utils import Config
 
 device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
 
-with open(osp.join(Config['root_path'], Config['out_file']), 'w') as test_output:
+with open(osp.join(Config['root_path'], Config['out_file_test']), 'w') as test_output:
 
     model = model_mobilenet
     fc_features = model.classifier[1].in_features

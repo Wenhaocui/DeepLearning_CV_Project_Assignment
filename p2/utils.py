@@ -10,6 +10,7 @@ Config['meta_file'] = 'polyvore_item_metadata.json'
 Config['test_txt'] = 'test_category_hw.txt'
 Config['out_file'] = 'test_category_output.txt'
 Config['out_file2'] = 'test_category_output2.txt'
+Config['out_file_test'] = 'test_category_output_trail.txt'
 Config['checkpoint_path'] = ''
 
 
