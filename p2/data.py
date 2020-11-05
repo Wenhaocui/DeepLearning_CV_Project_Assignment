@@ -219,7 +219,7 @@ class polyvore_comp(Dataset):
     def __getitem__(self, item):
         file_path_1 = osp.join(self.image_dir, self.X_comp[item][0])
         file_path_2 = osp.join(self.image_dir, self.X_comp[item][1])
-        return [self.transform(Image.open(file_path_1)), self.transform(Image.open(file_path_2))], self.y_test[item]
+        return torch.cat((self.transform(Image.open(file_path_1)), self.transform(Image.open(file_path_2))), 0), self.y_comp[item]
 
 
 def get_comploader(debug, batch_size, num_workers):

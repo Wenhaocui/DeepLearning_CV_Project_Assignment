@@ -11,7 +11,7 @@ import os.path as osp
 
 from utils import Config
 from model import compModel
-from data import get_dataloader
+from data import get_comploader
 
 import sys
 import matplotlib.pyplot as plt
@@ -100,8 +100,8 @@ if __name__=='__main__':
     loss_train_list = []
     loss_test_list = []
 
-    dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
-    model = compModel()
+    dataloaders, classes, dataset_size = get_comploader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
+    model = compModel(input_shape=(224,224,3))
 
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=Config['learning_rate'], weight_decay=0.0002)
