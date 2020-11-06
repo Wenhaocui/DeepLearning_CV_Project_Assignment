@@ -15,7 +15,7 @@ Config['checkpoint_path'] = ''
 
 
 Config['use_cuda'] = True
-Config['debug'] = False
+Config['debug'] = True
 Config['num_epochs'] = 10
 Config['batch_size'] = 64
 
@@ -28,4 +28,5 @@ Config['pretrained'] = True
 
 Config['train_compatability']='pairwise_comp_train.txt'
 Config['valid_compatability']='pairwise_comp_valid.txt'
+Config['test_compatability'] = 'test_pairwise_compat_hw.txt'
 Config['out_compatability'] = 'pairwise_comp_test_res.txt'

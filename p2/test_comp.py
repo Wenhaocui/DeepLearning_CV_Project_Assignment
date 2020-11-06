@@ -36,10 +36,10 @@ with open(osp.join(Config['root_path'], Config['out_compatability']), 'w') as te
         inputs = inputs.to(device)
 
         outputs = model(inputs)
-        pred_score = outputs
-        pred[pred_score >= 0.5] = 1.0
-        pred[pred_score < 0.5] = 0.0
-
+        if outputs[0][0].item() >= 0.5:
+            pred = 1.0
+        else:
+            pred = 0.0
         line = ""
-        line = str(input_name[0][0][:-4]) + ' ' + str(input_name[1][0][:-4]) + ' ' + str(outputs[0][0].item()) +' '+ str(pred.item()) + '\n'
+        line = str(input_name[0][0][:-4]) + ' ' + str(input_name[1][0][:-4]) + ' ' + str(outputs[0][0].item()) +' '+ str(pred) + '\n'
         test_output.write(line)
