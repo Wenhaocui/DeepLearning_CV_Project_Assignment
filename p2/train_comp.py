@@ -56,12 +56,11 @@ def train_comp_model(dataloader, model, criterion, optimizer, device, num_epochs
                 labels = torch.Tensor(labels.astype('long'))
                 inputs = inputs.to(device)
                 labels = labels.to(device)
-                labels = labels.view(-1,1)
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase=='train'):
                     outputs = model(inputs)
-                    loss = criterion(outputs, labels)
+                    loss = criterion(torch.flatten(outputs), labels)
 
                     if phase=='train':
                         loss.backward()
@@ -69,9 +68,10 @@ def train_comp_model(dataloader, model, criterion, optimizer, device, num_epochs
 
 
                 running_loss += loss.item() * inputs.size(0)
-                pred = outputs
-                pred[pred >= 0.5] = 1.0
-                pred[pred < 0.5] = 0.0
+                if outputs[0][0].item() >= 0.5:
+                    pred = 1.0
+                else:
+                    pred = 0.0
                 running_corrects += torch.sum(pred==labels.data)
 
             epoch_loss = running_loss / dataset_size[phase]
